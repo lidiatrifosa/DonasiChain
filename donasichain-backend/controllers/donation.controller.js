@@ -1,15 +1,20 @@
-const crypto = require("crypto");
 const midtransClient = require("midtrans-client");
 const db = require("../config/db");
 const { recordDonationOnChain } = require("../config/blockchain");
+const {
+  verifyWebhookSignature,
+  mapMidtransStatus,
+  isFinalPaymentStatus,
+  applySnapTokenVisibility,
+  webhookAmountMatchesDb,
+} = require("../utils/payment.helpers");
 
 const snap = new midtransClient.Snap({
   isProduction: false,
   serverKey: process.env.MIDTRANS_SERVER_KEY,
-  clientKey: process.env.MIDTRANS_CLIENT_KEY,
+  clientKey: process.env.MIDTRANS_CLIENT_KEY,a
 });
 
-// POST /api/donations — buat donasi baru, return snap_token ke frontend
 async function createDonation(req, res) {
   const { campaign_id, amount, message } = req.body;
 
@@ -17,7 +22,6 @@ async function createDonation(req, res) {
   try {
     await conn.beginTransaction();
 
-    // Validasi kampanye
     const [campaigns] = await conn.query(
       "SELECT * FROM campaigns WHERE id = ? AND is_approved = TRUE",
       [campaign_id]
@@ -34,14 +38,11 @@ async function createDonation(req, res) {
       return res.status(400).json({ success: false, message: "Kampanye tidak menerima donasi saat ini." });
     }
 
-    // Buat order_id unik
     const order_id = `DONASI-${campaign_id}-${req.user.id}-${Date.now()}`;
 
-    // Ambil data user
     const [users] = await conn.query("SELECT name, email FROM users WHERE id = ?", [req.user.id]);
     const user = users[0];
 
-    // Buat transaksi Midtrans Snap
     const midtransParam = {
       transaction_details: {
         order_id,
@@ -63,7 +64,6 @@ async function createDonation(req, res) {
 
     const transaction = await snap.createTransaction(midtransParam);
 
-    // Simpan donasi dengan status pending
     const [result] = await conn.query(
       `INSERT INTO donations (campaign_id, user_id, order_id, amount, snap_token, message)
        VALUES (?, ?, ?, ?, ?, ?)`,
@@ -92,24 +92,10 @@ async function createDonation(req, res) {
   }
 }
 
-// POST /api/donations/webhook — notifikasi dari Midtrans
 async function handleWebhook(req, res) {
   const notification = req.body;
 
-  // 1. Verifikasi signature Midtrans
-  // Format: SHA512(order_id + status_code + gross_amount + server_key)
-  const signatureString =
-    notification.order_id +
-    notification.status_code +
-    notification.gross_amount +
-    process.env.MIDTRANS_SERVER_KEY;
-
-  const expectedSignature = crypto
-    .createHash("sha512")
-    .update(signatureString)
-    .digest("hex");
-
-  if (notification.signature_key !== expectedSignature) {
+  if (!verifyWebhookSignature(notification, process.env.MIDTRANS_SERVER_KEY)) {
     console.warn(`Webhook: signature tidak valid. order_id=${notification.order_id}`);
     return res.status(403).json({ success: false, message: "Signature tidak valid." });
   }
@@ -120,44 +106,32 @@ async function handleWebhook(req, res) {
   try {
     await conn.beginTransaction();
 
-    // 2. Cari donasi berdasarkan order_id
     const [donations] = await conn.query(
-      "SELECT * FROM donations WHERE order_id = ?",
+      "SELECT * FROM donations WHERE order_id = ? FOR UPDATE",
       [order_id]
     );
 
     if (donations.length === 0) {
       await conn.rollback();
-      // Tetap return 200 agar Midtrans tidak retry terus
       return res.status(200).json({ success: false, message: "Donasi tidak ditemukan." });
     }
 
     const donation = donations[0];
 
-    // 3. Cegah pemrosesan berulang — jika sudah final, abaikan
-    const finalStatuses = ["success", "failed", "expired"];
-    if (finalStatuses.includes(donation.payment_status)) {
+    if (!webhookAmountMatchesDb(notification.gross_amount, donation.amount)) {
+      await conn.rollback();
+      console.warn(`Webhook: nominal tidak cocok. order_id=${order_id}`);
+      return res.status(200).json({ success: false, message: "Nominal tidak cocok." });
+    }
+
+    if (isFinalPaymentStatus(donation.payment_status)) {
       await conn.rollback();
       console.log(`Webhook: notifikasi berulang diabaikan. order_id=${order_id} status=${donation.payment_status}`);
       return res.status(200).json({ success: true, message: "Notifikasi sudah diproses sebelumnya." });
     }
 
-    // 4. Tentukan payment_status berdasarkan notifikasi Midtrans
-    let newPaymentStatus = "pending";
+    const newPaymentStatus = mapMidtransStatus(transaction_status, fraud_status);
 
-    if (transaction_status === "capture") {
-      newPaymentStatus = fraud_status === "accept" ? "success" : "failed";
-    } else if (transaction_status === "settlement") {
-      newPaymentStatus = "success";
-    } else if (["cancel", "deny", "failure"].includes(transaction_status)) {
-      newPaymentStatus = "failed";
-    } else if (transaction_status === "expire") {
-      newPaymentStatus = "expired";
-    } else if (transaction_status === "pending") {
-      newPaymentStatus = "pending";
-    }
-
-    // 5. Update status donasi
     await conn.query(
       `UPDATE donations
        SET payment_status = ?, payment_method = ?, midtrans_transaction_id = ?, updated_at = NOW()
@@ -165,47 +139,49 @@ async function handleWebhook(req, res) {
       [newPaymentStatus, payment_type || null, transaction_id || null, order_id]
     );
 
-    // 6. Jika sukses: update collected_amount kampanye + cek target
     if (newPaymentStatus === "success") {
       await conn.query(
         "UPDATE campaigns SET collected_amount = collected_amount + ? WHERE id = ?",
         [donation.amount, donation.campaign_id]
       );
 
-      // Cek apakah target tercapai
       const [updatedCampaign] = await conn.query(
         "SELECT * FROM campaigns WHERE id = ?",
         [donation.campaign_id]
       );
       const campaign = updatedCampaign[0];
 
-      if (
-        campaign.collected_amount >= campaign.target_amount &&
-        campaign.status !== "target_reached" &&
-        campaign.status !== "released"
-      ) {
-        await conn.query(
-          "UPDATE campaigns SET status = 'target_reached' WHERE id = ?",
-          [donation.campaign_id]
-        );
-        await conn.query(
-          `INSERT INTO campaign_status_logs (campaign_id, old_status, new_status, note)
-           VALUES (?, ?, 'target_reached', 'Target dana tercapai secara otomatis.')`,
-          [donation.campaign_id, campaign.status]
-        );
-      }
+if (
+  campaign.collected_amount >= campaign.target_amount &&
+  campaign.status !== "target_reached" &&
+  campaign.status !== "released"
+) {
+  await conn.query(
+    "UPDATE campaigns SET status = 'target_reached' WHERE id = ?",
+    [donation.campaign_id]
+  );
 
-      await conn.commit();
+  await conn.query(
+    `INSERT INTO campaign_status_logs (campaign_id, old_status, new_status, note)
+     VALUES (?, ?, 'target_reached', 'Target dana tercapai secara otomatis.')`,
+    [donation.campaign_id, campaign.status]
+  );
+}
 
-      // 7. Catat ke blockchain (async, tidak memblokir response)
-      // Jalankan setelah commit agar data DB sudah konsisten
+await conn.commit();
+
       setImmediate(async () => {
-        try {
-          const txHash = await recordDonationOnChain(
-            donation.campaign_id,
-            order_id,
-            donation.amount
-          );
+  try {
+    await db.query(
+      "UPDATE donations SET blockchain_status = 'pending' WHERE order_id = ?",
+      [order_id]
+    );
+
+    const txHash = await recordDonationOnChain(
+      donation.campaign_id,
+      order_id,
+      donation.amount
+    );
 
           if (txHash) {
             await db.query(
@@ -234,14 +210,12 @@ async function handleWebhook(req, res) {
   } catch (err) {
     await conn.rollback();
     console.error("handleWebhook error:", err);
-    // Tetap return 200 agar Midtrans tidak retry berulang kali
     return res.status(200).json({ success: false, message: "Terjadi kesalahan saat memproses notifikasi." });
   } finally {
     conn.release();
   }
 }
 
-// GET /api/donations/:id — detail donasi milik user yang login
 async function getDonationById(req, res) {
   try {
     const [rows] = await db.query(
@@ -265,12 +239,11 @@ async function getDonationById(req, res) {
   }
 }
 
-// GET /api/donations/status/:order_id — polling status donasi by order_id (untuk frontend)
 async function getDonationStatusByOrderId(req, res) {
   try {
     const [rows] = await db.query(
       `SELECT d.order_id, d.amount, d.payment_status, d.payment_method,
-              d.blockchain_tx_hash, d.blockchain_status, d.updated_at,
+              d.snap_token, d.blockchain_tx_hash, d.blockchain_status, d.updated_at,
               c.title AS campaign_title, c.id AS campaign_id
        FROM donations d
        JOIN campaigns c ON d.campaign_id = c.id
@@ -282,7 +255,7 @@ async function getDonationStatusByOrderId(req, res) {
       return res.status(404).json({ success: false, message: "Donasi tidak ditemukan." });
     }
 
-    return res.status(200).json({ success: true, data: rows[0] });
+    return res.status(200).json({ success: true, data: applySnapTokenVisibility(rows[0]) });
   } catch (err) {
     console.error("getDonationStatusByOrderId error:", err);
     return res.status(500).json({ success: false, message: "Terjadi kesalahan server." });

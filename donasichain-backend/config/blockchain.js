@@ -1,24 +1,6 @@
 const { ethers } = require("ethers");
 
 // ============================================================
-<<<<<<< HEAD
-// Blockchain Service — Integrasi Smart Contract Ethereum Sepolia
-//
-// File ini adalah "slot" integrasi untuk tim blockchain.
-// Sesuaikan ABI dan nama fungsi setelah smart contract di-deploy.
-// ============================================================
-
-// ABI minimal — sesuaikan dengan smart contract tim blockchain
-// Fungsi yang dibutuhkan backend:
-//   1. recordDonation(campaignId, hashedDonorRef, amount)
-//   2. updateCampaignStatus(campaignId, newStatus)
-const CONTRACT_ABI = [
-  // Contoh ABI — GANTI dengan ABI asli dari tim blockchain
-  "function recordDonation(uint256 campaignId, bytes32 hashedDonorRef, uint256 amount) external",
-  "function updateCampaignStatus(uint256 campaignId, string calldata newStatus) external",
-  "event DonationRecorded(uint256 indexed campaignId, bytes32 hashedDonorRef, uint256 amount)",
-  "event CampaignStatusUpdated(uint256 indexed campaignId, string newStatus)",
-=======
 // Blockchain Service — DonasiChain Smart Contract Integration
 // Network: Ethereum Sepolia Testnet
 //
@@ -61,10 +43,33 @@ const CONTRACT_ABI = [
   "error InvalidDeadline()",
   "error InvalidStatus()",
   "error EmptyDonationId()",
->>>>>>> ee901e3 (feat: add blockchain module - smart contract, tests, deployment Sepolia)
 ];
 
 let contract = null;
+
+
+function dateToWIBTimestamp(dateValue) {
+  const dateString =
+    dateValue instanceof Date
+      ? new Intl.DateTimeFormat("en-CA", {
+          timeZone: "Asia/Jakarta",
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+        }).format(dateValue)
+      : String(dateValue).slice(0, 10);
+
+  const timestamp = new Date(
+    `${dateString}T00:00:00+07:00`
+  ).getTime();
+
+  if (!Number.isFinite(timestamp)) {
+    throw new Error(`Tanggal deadline tidak valid: ${dateValue}`);
+  }
+
+  return Math.floor(timestamp / 1000);
+}
+
 
 function getContract() {
   if (contract) return contract;
@@ -89,9 +94,6 @@ function getContract() {
   }
 }
 
-<<<<<<< HEAD
-// Catat donasi ke smart contract setelah pembayaran Midtrans terverifikasi
-=======
 // ============================================================
 // recordDonationOnChain
 // Dipanggil oleh donation.controller.js setelah webhook Midtrans sukses.
@@ -103,7 +105,6 @@ function getContract() {
 //
 // Return: txHash (string) atau null jika gagal
 // ============================================================
->>>>>>> ee901e3 (feat: add blockchain module - smart contract, tests, deployment Sepolia)
 async function recordDonationOnChain(campaignId, donationOrderId, amount) {
   const c = getContract();
   if (!c) {
@@ -112,16 +113,6 @@ async function recordDonationOnChain(campaignId, donationOrderId, amount) {
   }
 
   try {
-<<<<<<< HEAD
-    // Hash order_id sebagai referensi donatur (tidak menyimpan data pribadi on-chain)
-    const hashedRef = ethers.keccak256(ethers.toUtf8Bytes(donationOrderId));
-    const amountInWei = ethers.parseUnits(String(amount), 0); // amount dalam Rupiah (integer)
-
-    const tx = await c.recordDonation(campaignId, hashedRef, amountInWei);
-    const receipt = await tx.wait();
-
-    console.log(`Blockchain: donasi tercatat. txHash=${receipt.hash}`);
-=======
     // Hash order_id sebagai referensi pembayaran — tidak menyimpan data pribadi on-chain
     const paymentRefHash = ethers.keccak256(ethers.toUtf8Bytes(donationOrderId));
 
@@ -129,7 +120,6 @@ async function recordDonationOnChain(campaignId, donationOrderId, amount) {
     const receipt = await tx.wait();
 
     console.log(`Blockchain: donasi tercatat. txHash=${receipt.hash} orderId=${donationOrderId}`);
->>>>>>> ee901e3 (feat: add blockchain module - smart contract, tests, deployment Sepolia)
     return receipt.hash;
   } catch (err) {
     console.error(`Blockchain: recordDonation gagal. orderId=${donationOrderId}`, err.message);
@@ -137,9 +127,6 @@ async function recordDonationOnChain(campaignId, donationOrderId, amount) {
   }
 }
 
-<<<<<<< HEAD
-// Update status kampanye di smart contract
-=======
 // ============================================================
 // updateCampaignStatusOnChain
 // Dipanggil oleh scheduler.js saat status kampanye berubah.
@@ -150,7 +137,6 @@ async function recordDonationOnChain(campaignId, donationOrderId, amount) {
 //
 // Return: txHash (string) atau null jika gagal
 // ============================================================
->>>>>>> ee901e3 (feat: add blockchain module - smart contract, tests, deployment Sepolia)
 async function updateCampaignStatusOnChain(campaignId, newStatus) {
   const c = getContract();
   if (!c) {
@@ -170,9 +156,6 @@ async function updateCampaignStatusOnChain(campaignId, newStatus) {
   }
 }
 
-<<<<<<< HEAD
-module.exports = { recordDonationOnChain, updateCampaignStatusOnChain };
-=======
 // ============================================================
 // createCampaignOnChain
 // Dipanggil saat admin menyetujui kampanye (approveCampaign).
@@ -194,7 +177,7 @@ async function createCampaignOnChain(campaignId, title, targetAmount, deadline) 
 
   try {
     // Konversi deadline ke Unix timestamp (detik)
-    const deadlineTimestamp = Math.floor(new Date(deadline).getTime() / 1000);
+   const deadlineTimestamp = dateToWIBTimestamp(deadline);
 
     const tx = await c.createCampaign(campaignId, title, targetAmount, deadlineTimestamp);
     const receipt = await tx.wait();
@@ -225,7 +208,7 @@ async function extendCampaignOnChain(campaignId, newDeadline) {
   }
 
   try {
-    const newDeadlineTimestamp = Math.floor(new Date(newDeadline).getTime() / 1000);
+    const newDeadlineTimestamp = dateToWIBTimestamp(newDeadline);
 
     const tx = await c.extendCampaign(campaignId, newDeadlineTimestamp);
     const receipt = await tx.wait();
@@ -244,4 +227,3 @@ module.exports = {
   createCampaignOnChain,
   extendCampaignOnChain,
 };
->>>>>>> ee901e3 (feat: add blockchain module - smart contract, tests, deployment Sepolia)

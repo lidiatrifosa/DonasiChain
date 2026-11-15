@@ -1,6 +1,9 @@
 const cron = require("node-cron");
 const db = require("./config/db");
-const { updateCampaignStatusOnChain } = require("./config/blockchain");
+const {
+  updateCampaignStatusOnChain,
+  extendCampaignOnChain,
+} = require("./config/blockchain");
 
 // ============================================================
 // Scheduler DonasiChain
@@ -21,7 +24,12 @@ async function checkCampaignDeadlines() {
   try {
     await conn.beginTransaction();
 
-    const today = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
+   const today = new Intl.DateTimeFormat("en-CA", {
+  timeZone: "Asia/Jakarta",
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+}).format(new Date());
 
     // 1. Kampanye 'active' yang deadline-nya sudah lewat dan target belum tercapai
     //    → ubah ke 'extended' (perpanjangan 7 hari)
@@ -35,6 +43,9 @@ async function checkCampaignDeadlines() {
       [today]
     );
 
+    const blockchainExtensions = [];
+    const blockchainEndings = [];
+
     for (const campaign of toExtend) {
       const extensionDays = parseInt(process.env.CAMPAIGN_EXTENSION_DAYS) || 7;
       await conn.query(
@@ -44,17 +55,23 @@ async function checkCampaignDeadlines() {
          WHERE id = ?`,
         [extensionDays, campaign.id]
       );
+      const [updatedCampaign] = await conn.query(
+  "SELECT extended_deadline FROM campaigns WHERE id = ?",
+  [campaign.id]
+);
+
+if (updatedCampaign.length > 0) {
+  blockchainExtensions.push({
+    campaignId: campaign.id,
+    newDeadline: updatedCampaign[0].extended_deadline,
+  });
+}
       await conn.query(
         `INSERT INTO campaign_status_logs (campaign_id, old_status, new_status, note)
          VALUES (?, 'active', 'extended', 'Deadline awal terlewat, kampanye diperpanjang otomatis.')`,
         [campaign.id]
       );
       console.log(`[Scheduler] Kampanye #${campaign.id} diperpanjang ${extensionDays} hari.`);
-
-      // Update status di blockchain (fire and forget)
-      updateCampaignStatusOnChain(campaign.id, "EXTENDED").catch((err) =>
-        console.error(`[Scheduler] Blockchain updateStatus gagal untuk kampanye #${campaign.id}:`, err.message)
-      );
     }
 
     // 2. Kampanye 'extended' yang extended_deadline-nya sudah lewat dan target belum tercapai
@@ -81,12 +98,35 @@ async function checkCampaignDeadlines() {
       );
       console.log(`[Scheduler] Kampanye #${campaign.id} berakhir (target tidak tercapai).`);
 
-      updateCampaignStatusOnChain(campaign.id, "ENDED").catch((err) =>
-        console.error(`[Scheduler] Blockchain updateStatus gagal untuk kampanye #${campaign.id}:`, err.message)
-      );
+      blockchainEndings.push(campaign.id);
     }
 
     await conn.commit();
+
+// Sinkronisasi perpanjangan kampanye ke blockchain
+for (const item of blockchainExtensions) {
+  try {
+    await extendCampaignOnChain(item.campaignId, item.newDeadline);
+  } catch (err) {
+    console.error(
+      `[Scheduler] Blockchain extendCampaign gagal untuk kampanye #${item.campaignId}:`,
+      err.message
+    );
+  }
+}
+
+// Sinkronisasi status ended ke blockchain
+for (const campaignId of blockchainEndings) {
+  try {
+    await updateCampaignStatusOnChain(campaignId, "ENDED");
+  } catch (err) {
+    console.error(
+      `[Scheduler] Blockchain updateStatus gagal untuk kampanye #${campaignId}:`,
+      err.message
+    );
+  }
+}
+
     console.log(
       `[Scheduler] Selesai. Diperpanjang: ${toExtend.length}, Berakhir: ${toEnd.length}.`
     );

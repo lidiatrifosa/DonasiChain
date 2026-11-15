@@ -1,5 +1,11 @@
 const db = require("../config/db");
 
+const {
+  createCampaignOnChain,
+  updateCampaignStatusOnChain,
+  extendCampaignOnChain,
+} = require("../config/blockchain");
+
 // Helper: catat perubahan status kampanye
 async function logStatusChange(conn, campaignId, oldStatus, newStatus, changedBy = null, note = null) {
   await conn.query(
@@ -140,11 +146,37 @@ async function approveCampaign(req, res) {
     }
 
     if (approved) {
+      const campaign = rows[0];
+
       await conn.query(
         "UPDATE campaigns SET is_approved = TRUE, contract_address = ? WHERE id = ?",
         [contract_address || null, req.params.id]
       );
       await conn.commit();
+
+      // Catat kampanye ke blockchain secara async — kegagalan blockchain tidak membatalkan approval DB
+      setImmediate(async () => {
+        try {
+          const txHash = await createCampaignOnChain(
+            campaign.id,
+            campaign.title,
+            campaign.target_amount, // integer Rupiah, sesuai uint256 contract
+            campaign.deadline       // string "YYYY-MM-DD", dikonversi ke Unix timestamp di dalam fungsi
+          );
+          if (txHash) {
+            await db.query(
+              "UPDATE campaigns SET contract_address = ? WHERE id = ?",
+              [process.env.CONTRACT_ADDRESS, campaign.id]
+            );
+            console.log(`Blockchain: kampanye #${campaign.id} dicatat. txHash=${txHash}`);
+          } else {
+            console.warn(`Blockchain: createCampaign dilewati atau gagal untuk kampanye #${campaign.id}`);
+          }
+        } catch (blockchainErr) {
+          console.error(`Blockchain async error (approveCampaign #${campaign.id}):`, blockchainErr.message);
+        }
+      });
+
       return res.status(200).json({ success: true, message: "Kampanye disetujui." });
     } else {
       await conn.query("UPDATE campaigns SET is_approved = FALSE WHERE id = ?", [req.params.id]);
@@ -161,22 +193,35 @@ async function approveCampaign(req, res) {
 }
 
 // PATCH /api/campaigns/:id/status — update status kampanye (admin)
+
+// PATCH /api/campaigns/:id/status — update status kampanye (admin)
 async function updateCampaignStatus(req, res) {
   const { status, note } = req.body;
   const allowedStatuses = ["active", "extended", "target_reached", "released", "ended"];
 
   if (!allowedStatuses.includes(status)) {
-    return res.status(400).json({ success: false, message: "Status tidak valid." });
+    return res.status(400).json({
+      success: false,
+      message: "Status tidak valid.",
+    });
   }
 
   const conn = await db.getConnection();
+
   try {
     await conn.beginTransaction();
 
-    const [rows] = await conn.query("SELECT * FROM campaigns WHERE id = ?", [req.params.id]);
+    const [rows] = await conn.query(
+      "SELECT * FROM campaigns WHERE id = ?",
+      [req.params.id]
+    );
+
     if (rows.length === 0) {
       await conn.rollback();
-      return res.status(404).json({ success: false, message: "Kampanye tidak ditemukan." });
+      return res.status(404).json({
+        success: false,
+        message: "Kampanye tidak ditemukan.",
+      });
     }
 
     const campaign = rows[0];
@@ -187,8 +232,12 @@ async function updateCampaignStatus(req, res) {
 
     // Jika diperpanjang, set extended_deadline otomatis
     if (status === "extended" && !campaign.extended_deadline) {
-      const extensionDays = parseInt(process.env.CAMPAIGN_EXTENSION_DAYS) || 7;
-      extraUpdate = ", extended_deadline = DATE_ADD(deadline, INTERVAL ? DAY)";
+      const extensionDays =
+        parseInt(process.env.CAMPAIGN_EXTENSION_DAYS) || 7;
+
+      extraUpdate =
+        ", extended_deadline = DATE_ADD(deadline, INTERVAL ? DAY)";
+
       extraParams.push(extensionDays);
     }
 
@@ -197,18 +246,86 @@ async function updateCampaignStatus(req, res) {
       [status, ...extraParams, req.params.id]
     );
 
-    await logStatusChange(conn, req.params.id, oldStatus, status, req.user.id, note || null);
+    // Ambil tanggal perpanjangan terbaru dari database
+    let extendedDeadline = null;
 
+    if (status === "extended") {
+      const [deadlineRows] = await conn.query(
+        "SELECT extended_deadline FROM campaigns WHERE id = ?",
+        [req.params.id]
+      );
+
+      extendedDeadline = deadlineRows[0]?.extended_deadline;
+
+      if (!extendedDeadline) {
+        throw new Error("Tanggal perpanjangan kampanye tidak ditemukan.");
+      }
+    }
+
+    await logStatusChange(
+      conn,
+      req.params.id,
+      oldStatus,
+      status,
+      req.user.id,
+      note || null
+    );
+
+    // Simpan perubahan database terlebih dahulu
     await conn.commit();
-    return res.status(200).json({ success: true, message: `Status kampanye diperbarui menjadi '${status}'.` });
+
+    // Sinkronisasi perubahan status ke blockchain
+    try {
+      let txHash = null;
+
+      if (status === "extended") {
+        // Perpanjangan harus memperbarui tanggal di smart contract
+        txHash = await extendCampaignOnChain(
+          campaign.id,
+          extendedDeadline
+        );
+      } else {
+        const blockchainStatus = status.toUpperCase();
+
+        txHash = await updateCampaignStatusOnChain(
+          campaign.id,
+          blockchainStatus
+        );
+      }
+
+      if (txHash) {
+        console.log(
+          `[Blockchain] Status kampanye #${campaign.id} diperbarui menjadi ${status}. txHash=${txHash}`
+        );
+      } else {
+        console.warn(
+          `[Blockchain] Sinkronisasi status kampanye #${campaign.id} gagal atau dilewati.`
+        );
+      }
+    } catch (blockchainErr) {
+      console.error(
+        `[Blockchain] Gagal memperbarui status kampanye #${campaign.id}:`,
+        blockchainErr.message
+      );
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: `Status kampanye diperbarui menjadi '${status}'.`,
+    });
   } catch (err) {
     await conn.rollback();
     console.error("updateCampaignStatus error:", err);
-    return res.status(500).json({ success: false, message: "Terjadi kesalahan server." });
+
+    return res.status(500).json({
+      success: false,
+      message: "Terjadi kesalahan server.",
+    });
   } finally {
     conn.release();
   }
 }
+
 
 // GET /api/campaigns/mine — kampanye milik fundraiser yang login
 async function getMyCampaigns(req, res) {
