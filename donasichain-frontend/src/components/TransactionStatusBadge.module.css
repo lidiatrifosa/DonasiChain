@@ -1,0 +1,12 @@
+.badge {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.25rem 0.65rem;
+  border-radius: 99px;
+}
+
+.success  { background: #dcfce7; color: #15803d; }
+.pending  { background: #fef9c3; color: #a16207; }
+.failed   { background: #fee2e2; color: #dc2626; }
+.expired  { background: #f3f4f6; color: #6b7280; }

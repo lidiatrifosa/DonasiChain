@@ -1,0 +1,161 @@
+.page {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 3rem 1.5rem;
+}
+
+.card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.09);
+  padding: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.iconRow {
+  text-align: center;
+}
+
+.iconSuccess, .iconPending, .iconFailed, .iconExpired {
+  font-size: 3rem;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #111827;
+  margin: 0;
+  text-align: center;
+}
+
+.statusRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.pollingNote {
+  font-size: 0.78rem;
+  color: #a16207;
+  font-style: italic;
+}
+
+.infoGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  background: #f9fafb;
+  border-radius: 10px;
+  padding: 1.25rem;
+}
+
+.infoItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.infoLabel {
+  font-size: 0.85rem;
+  color: #6b7280;
+  flex-shrink: 0;
+}
+
+.infoValue {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #111827;
+  text-align: right;
+}
+
+.infoLink {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #16a34a;
+  text-align: right;
+  text-decoration: none;
+}
+
+.infoLink:hover { text-decoration: underline; }
+
+.infoCode {
+  font-size: 0.8rem;
+  color: #374151;
+  word-break: break-all;
+  text-align: right;
+}
+
+.blockchainSection {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+}
+
+.blockchainTitle {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #15803d;
+  margin: 0 0 0.5rem;
+}
+
+.actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  padding-top: 0.5rem;
+}
+
+.btnDashboard {
+  background: #16a34a;
+  color: #fff;
+  padding: 0.65rem 1.25rem;
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.btnDashboard:hover { background: #15803d; }
+
+.btnKampanye {
+  background: #fff;
+  color: #374151;
+  border: 1.5px solid #e5e7eb;
+  padding: 0.65rem 1.25rem;
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.btnKampanye:hover { border-color: #16a34a; color: #16a34a; }
+
+.errorWrap {
+  text-align: center;
+  padding: 5rem 2rem;
+}
+
+.errorMsg {
+  color: #dc2626;
+  font-size: 1.1rem;
+  margin-bottom: 1.5rem;
+}
+
+.btnBack {
+  display: inline-block;
+  background: #16a34a;
+  color: #fff;
+  padding: 0.7rem 1.5rem;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+}

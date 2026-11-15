@@ -1,0 +1,27 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.status {
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.recorded     { color: #15803d; }
+.pending      { color: #a16207; }
+.failed       { color: #dc2626; }
+.not_recorded { color: #6b7280; }
+
+.link {
+  font-size: 0.78rem;
+  color: #2563eb;
+  font-family: monospace;
+  word-break: break-all;
+  text-decoration: none;
+}
+
+.link:hover {
+  text-decoration: underline;
+}

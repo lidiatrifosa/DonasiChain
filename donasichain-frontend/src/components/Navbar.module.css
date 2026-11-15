@@ -1,0 +1,91 @@
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2rem;
+  height: 64px;
+  background: #ffffff;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #16a34a;
+  text-decoration: none;
+}
+
+.brandIcon {
+  font-size: 1.4rem;
+}
+
+.links {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.links a {
+  text-decoration: none;
+  color: #374151;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.links a:hover {
+  color: #16a34a;
+}
+
+.btnMasuk {
+  color: #16a34a !important;
+  border: 1.5px solid #16a34a;
+  padding: 0.4rem 1rem;
+  border-radius: 6px;
+}
+
+.btnDaftar {
+  background: #16a34a;
+  color: #ffffff !important;
+  padding: 0.4rem 1rem;
+  border-radius: 6px;
+}
+
+.btnDaftar:hover {
+  background: #15803d !important;
+}
+
+.btnLogout {
+  background: none;
+  border: 1.5px solid #dc2626;
+  color: #dc2626;
+  padding: 0.4rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.btnLogout:hover {
+  background: #dc2626;
+  color: #fff;
+}
+
+@media (max-width: 640px) {
+  .navbar {
+    padding: 0 1rem;
+  }
+  .links {
+    gap: 0.75rem;
+  }
+  .links a {
+    font-size: 0.85rem;
+  }
+}

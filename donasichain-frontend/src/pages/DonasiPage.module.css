@@ -1,0 +1,392 @@
+.page {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 3rem 2rem;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: 2.5rem;
+  align-items: start;
+}
+
+/* Info kampanye */
+.campaignInfo {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  overflow: hidden;
+  position: sticky;
+  top: 80px;
+}
+
+.campaignImg {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+}
+
+.campaignTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 1rem 1rem 0.25rem;
+  line-height: 1.4;
+}
+
+.campaignFundraiser {
+  font-size: 0.85rem;
+  color: #6b7280;
+  margin: 0 1rem 0.75rem;
+}
+
+.campaignProgress {
+  height: 6px;
+  background: #e5e7eb;
+  margin: 0 1rem;
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.campaignProgressFill {
+  height: 100%;
+  background: #16a34a;
+  border-radius: 99px;
+}
+
+.campaignStats {
+  font-size: 0.85rem;
+  color: #6b7280;
+  margin: 0.5rem 1rem 1.25rem;
+}
+
+/* Form card */
+.formCard {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  padding: 2rem;
+}
+
+.formTitle {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #111827;
+  margin: 0 0 1.5rem;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.opsional {
+  font-weight: 400;
+  color: #9ca3af;
+}
+
+/* Nominal cepat */
+.nominalGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+}
+
+.nominalBtn {
+  padding: 0.55rem 0.5rem;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
+  color: #374151;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.nominalBtn:hover {
+  border-color: #16a34a;
+  color: #16a34a;
+}
+
+.nominalActive {
+  border-color: #16a34a;
+  background: #f0fdf4;
+  color: #15803d;
+  font-weight: 700;
+}
+
+/* Input nominal */
+.inputPrefix {
+  display: flex;
+  align-items: center;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+
+.inputPrefix:focus-within {
+  border-color: #16a34a;
+  box-shadow: 0 0 0 3px rgba(22,163,74,0.1);
+}
+
+.prefix {
+  padding: 0.7rem 0.75rem;
+  background: #f9fafb;
+  color: #6b7280;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border-right: 1.5px solid #e5e7eb;
+}
+
+.input {
+  flex: 1;
+  padding: 0.7rem 0.9rem;
+  border: none;
+  outline: none;
+  font-size: 0.95rem;
+  color: #111827;
+  font-family: inherit;
+}
+
+.inputError + .input,
+.inputPrefix.inputError {
+  border-color: #dc2626;
+}
+
+.nominalPreview {
+  font-size: 0.85rem;
+  color: #16a34a;
+  font-weight: 600;
+  margin: 0;
+}
+
+.fieldError {
+  font-size: 0.8rem;
+  color: #dc2626;
+  margin: 0;
+}
+
+.hint {
+  font-size: 0.78rem;
+  color: #9ca3af;
+  margin: 0;
+}
+
+/* Textarea */
+.textarea {
+  padding: 0.7rem 0.9rem;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: #111827;
+  resize: vertical;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.textarea:focus {
+  border-color: #16a34a;
+  box-shadow: 0 0 0 3px rgba(22,163,74,0.1);
+}
+
+.charCount {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  text-align: right;
+  margin: 0;
+}
+
+/* Alert */
+.alertError {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+}
+
+/* Submit */
+.btnSubmit {
+  background: #16a34a;
+  color: #fff;
+  border: none;
+  padding: 0.9rem;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+  font-family: inherit;
+}
+
+.btnSubmit:hover:not(:disabled) { background: #15803d; }
+.btnSubmit:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* Success card */
+.successCard {
+  max-width: 520px;
+  margin: 0 auto;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+  padding: 2.5rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.successIcon { font-size: 3rem; }
+
+.successTitle {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #111827;
+  margin: 0;
+}
+
+.successDesc {
+  font-size: 0.95rem;
+  color: #4b5563;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.midtransInfo {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 10px;
+  padding: 1.25rem;
+  text-align: left;
+}
+
+.midtransLabel {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #15803d;
+  margin: 0 0 0.4rem;
+}
+
+.midtransHint {
+  font-size: 0.85rem;
+  color: #4b5563;
+  margin: 0 0 0.75rem;
+}
+
+.btnMidtrans {
+  display: inline-block;
+  background: #16a34a;
+  color: #fff;
+  padding: 0.6rem 1.25rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+
+.btnMidtrans:hover { background: #15803d; }
+
+.orderInfo {
+  background: #f9fafb;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  text-align: left;
+}
+
+.orderLabel {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin: 0 0 0.25rem;
+}
+
+.orderValue {
+  font-size: 0.85rem;
+  color: #111827;
+  word-break: break-all;
+}
+
+.successActions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btnCekStatus {
+  background: #16a34a;
+  color: #fff;
+  border: none;
+  padding: 0.7rem 1.25rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.2s;
+}
+
+.btnCekStatus:hover { background: #15803d; }
+
+.btnDashboard {
+  background: #fff;
+  color: #374151;
+  border: 1.5px solid #e5e7eb;
+  padding: 0.7rem 1.25rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.btnDashboard:hover { border-color: #16a34a; color: #16a34a; }
+
+/* Error */
+.errorWrap {
+  text-align: center;
+  padding: 5rem 2rem;
+}
+
+.errorMsg {
+  color: #dc2626;
+  font-size: 1.1rem;
+  margin-bottom: 1.5rem;
+}
+
+.btnKembali {
+  display: inline-block;
+  background: #16a34a;
+  color: #fff;
+  padding: 0.7rem 1.5rem;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .page { padding: 2rem 1rem; }
+  .layout { grid-template-columns: 1fr; }
+  .campaignInfo { position: static; }
+  .nominalGrid { grid-template-columns: repeat(2, 1fr); }
+}

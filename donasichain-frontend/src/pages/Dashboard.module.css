@@ -1,0 +1,401 @@
+.page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 3rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* Profil header */
+.profileHeader {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  background: #fff;
+  border-radius: 16px;
+  padding: 1.75rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  flex-wrap: wrap;
+}
+
+.avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #16a34a, #4ade80);
+  color: #fff;
+  font-size: 1.75rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.profileInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.profileName {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #111827;
+  margin: 0;
+}
+
+.profileEmail {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+.roleBadge {
+  display: inline-block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  background: #f0fdf4;
+  color: #15803d;
+  padding: 0.2rem 0.6rem;
+  border-radius: 99px;
+  border: 1px solid #bbf7d0;
+  width: fit-content;
+}
+
+.btnBuatKampanye {
+  background: #16a34a;
+  color: #fff;
+  padding: 0.65rem 1.25rem;
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: background 0.2s;
+  white-space: nowrap;
+}
+
+.btnBuatKampanye:hover { background: #15803d; }
+
+/* Stats */
+.statsRow {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1rem;
+}
+
+.statCard {
+  background: #fff;
+  border-radius: 12px;
+  padding: 1.25rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.statNum {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #16a34a;
+}
+
+.statLbl {
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+/* Tabs */
+.tabs {
+  display: flex;
+  gap: 0.5rem;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.tab {
+  background: none;
+  border: none;
+  padding: 0.65rem 1.25rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #6b7280;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.tab:hover { color: #16a34a; }
+
+.tabActive {
+  color: #16a34a;
+  font-weight: 700;
+  border-bottom-color: #16a34a;
+}
+
+.tabContent {
+  min-height: 200px;
+}
+
+/* Riwayat donasi */
+.txList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.txCard {
+  background: #fff;
+  border-radius: 12px;
+  padding: 1.25rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.txTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.txLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  flex: 1;
+}
+
+.txCampaign {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #111827;
+  text-decoration: none;
+}
+
+.txCampaign:hover { color: #16a34a; }
+
+.txDate {
+  font-size: 0.8rem;
+  color: #9ca3af;
+}
+
+.txPesan {
+  font-size: 0.85rem;
+  color: #6b7280;
+  font-style: italic;
+  margin: 0;
+}
+
+.txRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.35rem;
+  flex-shrink: 0;
+}
+
+.txAmount {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #16a34a;
+}
+
+.txBlockchain {
+  padding-top: 0.5rem;
+  border-top: 1px solid #f3f4f6;
+}
+
+.txFooter {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.txDetailLink {
+  font-size: 0.82rem;
+  color: #2563eb;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.txDetailLink:hover { text-decoration: underline; }
+
+/* Kampanye fundraiser */
+.campList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.campCard {
+  background: #fff;
+  border-radius: 12px;
+  padding: 1.25rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.campTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.campTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #111827;
+  text-decoration: none;
+  display: block;
+  margin-bottom: 0.35rem;
+}
+
+.campTitle:hover { color: #16a34a; }
+
+.campMeta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.campStatus {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.2rem 0.6rem;
+  border-radius: 99px;
+}
+
+.campPending {
+  font-size: 0.78rem;
+  color: #a16207;
+}
+
+.campAmounts {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.campCollected {
+  display: block;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #16a34a;
+}
+
+.campTarget {
+  display: block;
+  font-size: 0.78rem;
+  color: #6b7280;
+}
+
+.campProgressBar {
+  height: 6px;
+  background: #e5e7eb;
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.campProgressFill {
+  height: 100%;
+  background: #16a34a;
+  border-radius: 99px;
+}
+
+.campFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.campDeadline {
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+.campPct {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #16a34a;
+}
+
+/* Pagination */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  margin-top: 1.5rem;
+}
+
+.pageBtn {
+  background: #fff;
+  border: 1.5px solid #e5e7eb;
+  color: #374151;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.pageBtn:hover:not(:disabled) { border-color: #16a34a; color: #16a34a; }
+.pageBtn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.pageInfo {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+/* Empty state */
+.emptyState {
+  text-align: center;
+  padding: 3rem 2rem;
+  color: #6b7280;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.emptyIcon {
+  font-size: 3rem;
+}
+
+.btnExplore {
+  display: inline-block;
+  background: #16a34a;
+  color: #fff;
+  padding: 0.6rem 1.25rem;
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-top: 0.5rem;
+}
+
+.errorMsg {
+  color: #dc2626;
+  text-align: center;
+  padding: 2rem;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .page { padding: 1.5rem 1rem; }
+  .profileHeader { flex-direction: column; align-items: flex-start; }
+  .txTop { flex-direction: column; }
+  .txRight { align-items: flex-start; }
+  .campTop { flex-direction: column; }
+  .campAmounts { text-align: left; }
+}
