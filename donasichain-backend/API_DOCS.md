@@ -18,8 +18,8 @@ Registrasi pengguna baru.
 **Request Body:**
 ```json
 {
-  "name": "Budi Santoso",
-  "email": "budi@example.com",
+  "name": "Nama Lengkap",
+  "email": "pengguna@example.com",
   "password": "password123",
   "role": "donor"
 }
@@ -33,8 +33,8 @@ Registrasi pengguna baru.
   "message": "Registrasi berhasil.",
   "data": {
     "id": 1,
-    "name": "Budi Santoso",
-    "email": "budi@example.com",
+    "name": "Nama Lengkap",
+    "email": "pengguna@example.com",
     "role": "donor"
   }
 }
@@ -50,7 +50,7 @@ Login dan dapatkan JWT token.
 **Request Body:**
 ```json
 {
-  "email": "budi@example.com",
+  "email": "pengguna@example.com",
   "password": "password123"
 }
 ```
@@ -64,8 +64,8 @@ Login dan dapatkan JWT token.
     "token": "<jwt_token>",
     "user": {
       "id": 1,
-      "name": "Budi Santoso",
-      "email": "budi@example.com",
+      "name": "Nama Lengkap",
+      "email": "pengguna@example.com",
       "role": "donor"
     }
   }
@@ -85,8 +85,8 @@ Ambil profil user yang sedang login. 🔒 Auth required.
   "success": true,
   "data": {
     "id": 1,
-    "name": "Budi Santoso",
-    "email": "budi@example.com",
+    "name": "Nama Lengkap",
+    "email": "pengguna@example.com",
     "role": "donor",
     "created_at": "2025-01-01T00:00:00.000Z"
   }
@@ -455,7 +455,7 @@ Riwayat donasi sukses per kampanye. Publik.
       "blockchain_status": "recorded",
       "message": "Semoga lekas pulih.",
       "created_at": "2025-01-01T00:00:00.000Z",
-      "donor_name": "Budi Santoso"
+      "donor_name": "Nama Donatur"
     }
   ],
   "pagination": { "page": 1, "limit": 10, "total": 12 }
