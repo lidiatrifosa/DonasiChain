@@ -5,7 +5,8 @@ const crypto = require("crypto");
 function verifyWebhookSignature(notification, serverKey) {
   const raw = notification.order_id + notification.status_code + notification.gross_amount + serverKey;
   const expected = crypto.createHash("sha512").update(raw).digest("hex");
-  return notification.signature_key === expected;
+  const received = String(notification.signature_key || "").padStart(128, "0");
+  return received === expected;
 }
 
 function mapMidtransStatus(transaction_status, fraud_status) {
