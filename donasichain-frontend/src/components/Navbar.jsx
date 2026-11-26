@@ -34,6 +34,7 @@ export default function Navbar() {
 
       <div className={`${styles.links} ${menuOpen ? styles.linksOpen : ''}`}>
         <Link to="/kampanye" onClick={() => setMenuOpen(false)}>Kampanye</Link>
+        <Link to="/donasi-sukarela" onClick={() => setMenuOpen(false)}>Donasi Sukarela</Link>
         {user ? (
           <>
             <Link to="/dashboard" onClick={() => setMenuOpen(false)}>Dashboard</Link>

@@ -14,6 +14,8 @@ import Dashboard from './pages/Dashboard';
 import BuatKampanye from './pages/BuatKampanye';
 import EditKampanye from './pages/EditKampanye';
 import KelolaKampanye from './pages/KelolaKampanye';
+import VoluntaryDonation from './pages/VoluntaryDonation';
+import VoluntaryStatus from './pages/VoluntaryStatus';
 
 export default function App() {
   return (
@@ -45,6 +47,13 @@ export default function App() {
               } />
               <Route path="/status/:order_id" element={
                 <ProtectedRoute><TransactionStatus /></ProtectedRoute>
+              } />
+              {/* Donasi Sukarela */}
+              <Route path="/donasi-sukarela" element={
+                <ProtectedRoute><VoluntaryDonation /></ProtectedRoute>
+              } />
+              <Route path="/status/voluntary/:order_id" element={
+                <ProtectedRoute><VoluntaryStatus /></ProtectedRoute>
               } />
               <Route path="/dashboard" element={
                 <ProtectedRoute><Dashboard /></ProtectedRoute>

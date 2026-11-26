@@ -1,6 +1,52 @@
 const db = require("../config/db");
 const { checkCampaignDeadlines } = require("../scheduler");
 
+// GET /api/admin/voluntary/stats — statistik donasi sukarela
+async function getVoluntaryStats(req, res) {
+  try {
+    const [[summary]] = await db.query(
+      `SELECT
+         COUNT(*) AS total_transactions,
+         SUM(payment_status = 'success') AS successful,
+         SUM(payment_status = 'pending') AS pending,
+         SUM(payment_status = 'failed') AS failed,
+         SUM(payment_status = 'expired') AS expired,
+         COALESCE(SUM(CASE WHEN payment_status = 'success' THEN amount ELSE 0 END), 0) AS total_collected
+       FROM voluntary_donations`
+    );
+
+    const { page = 1, limit = 20 } = req.query;
+    const offset = (parseInt(page) - 1) * parseInt(limit);
+
+    const [transactions] = await db.query(
+      `SELECT vd.id, vd.order_id, vd.amount, vd.payment_status, vd.payment_method,
+              vd.midtrans_transaction_id, vd.message, vd.created_at, vd.updated_at,
+              u.name AS donor_name, u.email AS donor_email
+       FROM voluntary_donations vd
+       JOIN users u ON vd.user_id = u.id
+       ORDER BY vd.created_at DESC
+       LIMIT ? OFFSET ?`,
+      [parseInt(limit), offset]
+    );
+
+    const [[{ total }]] = await db.query(
+      "SELECT COUNT(*) AS total FROM voluntary_donations"
+    );
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        summary,
+        transactions,
+        pagination: { page: parseInt(page), limit: parseInt(limit), total },
+      },
+    });
+  } catch (err) {
+    console.error("getVoluntaryStats error:", err);
+    return res.status(500).json({ success: false, message: "Terjadi kesalahan server." });
+  }
+}
+
 // GET /api/admin/stats — statistik ringkasan untuk dashboard admin
 async function getDashboardStats(req, res) {
   try {
@@ -74,4 +120,4 @@ async function triggerDeadlineCheck(req, res) {
   }
 }
 
-module.exports = { getDashboardStats, triggerDeadlineCheck };
+module.exports = { getDashboardStats, triggerDeadlineCheck, getVoluntaryStats };

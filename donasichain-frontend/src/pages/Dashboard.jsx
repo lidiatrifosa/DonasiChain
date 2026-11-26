@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { getProfile } from '../api/auth';
 import { getMyTransactions } from '../api/transaction';
 import { getMyCampaigns } from '../api/campaign';
+import { getMyVoluntaryDonations } from '../api/donation';
 import TransactionStatusBadge from '../components/TransactionStatusBadge';
 import BlockchainBadge from '../components/BlockchainBadge';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -29,8 +30,8 @@ const CAMPAIGN_STATUS_LABEL = {
   ended:          { label: 'Berakhir',         warna: '#6b7280', bg: '#f3f4f6' },
 };
 
-const TABS_DONOR      = ['Riwayat Donasi'];
-const TABS_FUNDRAISER = ['Riwayat Donasi', 'Kampanye Saya'];
+const TABS_DONOR      = ['Riwayat Donasi', 'Donasi Sukarela'];
+const TABS_FUNDRAISER = ['Riwayat Donasi', 'Donasi Sukarela', 'Kampanye Saya'];
 
 export default function Dashboard() {
   const { user: authUser } = useAuth();
@@ -65,6 +66,14 @@ export default function Dashboard() {
   const [campError, setCampError] = useState(null);
   const [campFetched, setCampFetched] = useState(false);
 
+  // Donasi sukarela
+  const [voluntaryList, setVoluntaryList] = useState([]);
+  const [voluntaryLoading, setVoluntaryLoading] = useState(false);
+  const [voluntaryError, setVoluntaryError] = useState(null);
+  const [voluntaryFetched, setVoluntaryFetched] = useState(false);
+  const [voluntaryPagination, setVoluntaryPagination] = useState({ total: 0 });
+  const [voluntaryPage, setVoluntaryPage] = useState(1);
+
   // Fetch riwayat donasi
   useEffect(() => {
     setTxLoading(true);
@@ -91,7 +100,23 @@ export default function Dashboard() {
     }
   }, [activeTab, isFundraiser, campFetched]);
 
+  // Fetch donasi sukarela — saat tab aktif
+  useEffect(() => {
+    if (activeTab === 'Donasi Sukarela') {
+      setVoluntaryLoading(true);
+      getMyVoluntaryDonations({ page: voluntaryPage, limit: 10 })
+        .then((res) => {
+          setVoluntaryList(res.data.data || []);
+          setVoluntaryPagination(res.data.pagination || { total: 0 });
+          setVoluntaryFetched(true);
+        })
+        .catch(() => setVoluntaryError('Gagal memuat donasi sukarela.'))
+        .finally(() => setVoluntaryLoading(false));
+    }
+  }, [activeTab, voluntaryPage]);
+
   const txTotalPages = Math.ceil((txPagination.total || 0) / 10);
+  const voluntaryTotalPages = Math.ceil((voluntaryPagination.total || 0) / 10);
 
   if (profileLoading) return <LoadingSpinner text="Memuat profil..." />;
 
@@ -240,9 +265,95 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* ── Tab: Kampanye Saya (fundraiser) ── */}
-      {activeTab === 'Kampanye Saya' && isFundraiser && (
+      {/* ── Tab: Donasi Sukarela ── */}
+      {activeTab === 'Donasi Sukarela' && (
         <div className={styles.tabContent}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+            <p style={{ margin: 0, fontSize: '0.9rem', color: '#6b7280' }}>
+              Donasi sukarela untuk mendukung operasional platform DonasiChain.
+            </p>
+            <Link
+              to="/donasi-sukarela"
+              style={{
+                background: '#16a34a', color: '#fff', padding: '0.5rem 1rem',
+                borderRadius: '8px', fontSize: '0.875rem', fontWeight: 600,
+                textDecoration: 'none',
+              }}
+            >
+              + Donasi Sukarela
+            </Link>
+          </div>
+
+          {voluntaryLoading && <LoadingSpinner text="Memuat donasi sukarela..." />}
+          {voluntaryError && <p className={styles.errorMsg}>{voluntaryError}</p>}
+          {!voluntaryLoading && !voluntaryError && voluntaryList.length === 0 && (
+            <div className={styles.emptyState}>
+              <span className={styles.emptyIcon}>💚</span>
+              <p>Belum ada donasi sukarela.</p>
+              <Link to="/donasi-sukarela" className={styles.btnExplore}>
+                Donasi Sekarang
+              </Link>
+            </div>
+          )}
+
+          {!voluntaryLoading && !voluntaryError && voluntaryList.length > 0 && (
+            <>
+              <div className={styles.txList}>
+                {voluntaryList.map((vd) => (
+                  <div key={vd.id} className={styles.txCard}>
+                    <div className={styles.txTop}>
+                      <div className={styles.txLeft}>
+                        <span className={styles.txCampaign}>💚 Donasi Sukarela Platform</span>
+                        <span className={styles.txDate}>{formatTanggal(vd.created_at)}</span>
+                        {vd.message && (
+                          <p className={styles.txPesan}>"{vd.message}"</p>
+                        )}
+                      </div>
+                      <div className={styles.txRight}>
+                        <span className={styles.txAmount}>{formatRupiah(vd.amount)}</span>
+                        <TransactionStatusBadge status={vd.payment_status} />
+                      </div>
+                    </div>
+                    <div className={styles.txFooter}>
+                      <Link
+                        to={`/status/voluntary/${vd.order_id}`}
+                        className={styles.txDetailLink}
+                      >
+                        Lihat Detail →
+                      </Link>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {voluntaryTotalPages > 1 && (
+                <div className={styles.pagination}>
+                  <button
+                    className={styles.pageBtn}
+                    onClick={() => setVoluntaryPage((p) => p - 1)}
+                    disabled={voluntaryPage === 1}
+                  >
+                    ← Sebelumnya
+                  </button>
+                  <span className={styles.pageInfo}>
+                    {voluntaryPage} / {voluntaryTotalPages}
+                  </span>
+                  <button
+                    className={styles.pageBtn}
+                    onClick={() => setVoluntaryPage((p) => p + 1)}
+                    disabled={voluntaryPage === voluntaryTotalPages}
+                  >
+                    Berikutnya →
+                  </button>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      )}
+
+      {/* ── Tab: Kampanye Saya (fundraiser) ── */}
+      {activeTab === 'Kampanye Saya' && isFundraiser && (        <div className={styles.tabContent}>
           {campLoading && <LoadingSpinner text="Memuat kampanye..." />}
           {campError && <p className={styles.errorMsg}>{campError}</p>}
           {!campLoading && !campError && campaigns.length === 0 && (

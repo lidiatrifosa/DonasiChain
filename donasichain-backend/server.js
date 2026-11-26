@@ -9,6 +9,7 @@ const campaignRoutes = require("./routes/campaign.routes");
 const donationRoutes = require("./routes/donation.routes");
 const transactionRoutes = require("./routes/transaction.routes");
 const adminRoutes = require("./routes/admin.routes");
+const voluntaryRoutes = require("./routes/voluntary.routes");
 const { startScheduler } = require("./scheduler");
 
 const app = express();
@@ -22,6 +23,7 @@ app.use("/api/campaigns", campaignRoutes);
 app.use("/api/donations", donationRoutes);
 app.use("/api/transactions", transactionRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/voluntary", voluntaryRoutes);
 
 // Health check
 app.get("/", (req, res) => {

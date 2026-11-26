@@ -117,6 +117,28 @@ export default function LandingPage() {
           <Link to="/kampanye" className={styles.btnSecondary}>Jelajahi Kampanye</Link>
         </div>
       </section>
+
+      {/* Donasi Sukarela */}
+      <section className={styles.fiturSection} style={{ background: '#f0fdf4' }}>
+        <div style={{ maxWidth: 640, margin: '0 auto', textAlign: 'center' }}>
+          <span style={{
+            display: 'inline-block', background: '#dcfce7', color: '#15803d',
+            fontSize: '0.8rem', fontWeight: 700, padding: '0.3rem 0.8rem',
+            borderRadius: '99px', border: '1px solid #bbf7d0', marginBottom: '1rem',
+          }}>
+            💚 Sukarela
+          </span>
+          <h2 className={styles.sectionTitle}>Dukung Pengembangan DonasiChain</h2>
+          <p style={{ color: '#4b5563', fontSize: '0.95rem', lineHeight: 1.65, margin: '0 0 1.5rem' }}>
+            Selain donasi untuk kampanye, kamu juga bisa mendukung keberlangsungan platform ini
+            secara langsung. Dana sukarela digunakan untuk operasional server, pengembangan fitur,
+            dan pemeliharaan sistem blockchain.
+          </p>
+          <Link to="/donasi-sukarela" className={styles.btnPrimary}>
+            Donasi Sukarela Sekarang →
+          </Link>
+        </div>
+      </section>
     </div>
   );
 }
