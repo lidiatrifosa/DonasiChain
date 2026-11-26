@@ -4,6 +4,7 @@ import { getCampaignById } from '../api/campaign';
 import { createDonation } from '../api/donation';
 import LoadingSpinner from '../components/LoadingSpinner';
 import styles from './DonasiPage.module.css';
+import { getCampaignImage, useCampaignImageFallback } from '../utils/campaignImage';
 
 const NOMINAL_CEPAT = [10000, 25000, 50000, 100000, 250000, 500000];
 
@@ -106,12 +107,14 @@ export default function DonasiPage() {
     );
   }
 
+  const campaignImage = getCampaignImage(campaign);
+
   // ── Tampilan setelah donasi berhasil dibuat ────────────────────────────────
   if (snapToken) {
     return (
       <div className={styles.page}>
         <div className={styles.successCard}>
-          <span className={styles.successIcon}>🎉</span>
+          <span className={styles.successIcon}>✓</span>
           <h2 className={styles.successTitle}>Donasi Berhasil Dibuat!</h2>
           <p className={styles.successDesc}>
             Donasi kamu untuk <strong>{campaign.title}</strong> sebesar{' '}
@@ -173,9 +176,12 @@ export default function DonasiPage() {
       <div className={styles.layout}>
         {/* Info kampanye */}
         <div className={styles.campaignInfo}>
-          {campaign.image_url && (
-            <img src={campaign.image_url} alt={campaign.title} className={styles.campaignImg} />
-          )}
+          <img
+            src={campaignImage}
+            alt={campaign.title}
+            className={styles.campaignImg}
+            onError={useCampaignImageFallback}
+          />
           <h2 className={styles.campaignTitle}>{campaign.title}</h2>
           <p className={styles.campaignFundraiser}>oleh {campaign.fundraiser_name}</p>
           <div className={styles.campaignProgress}>

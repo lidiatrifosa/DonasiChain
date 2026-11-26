@@ -5,6 +5,7 @@ import { getCampaignTransactions } from '../api/transaction';
 import { useAuth } from '../context/AuthContext';
 import LoadingSpinner from '../components/LoadingSpinner';
 import styles from './CampaignDetail.module.css';
+import { getCampaignImage, useCampaignImageFallback } from '../utils/campaignImage';
 
 function formatRupiah(amount) {
   return new Intl.NumberFormat('id-ID', {
@@ -82,16 +83,19 @@ export default function CampaignDetail() {
   const sisaHari = hitungSisaHari(deadline);
   const status = STATUS_INFO[campaign.status] || { label: campaign.status, warna: '#6b7280', bg: '#f3f4f6' };
   const bisaDonasi = ['active', 'extended'].includes(campaign.status);
+  const campaignImage = getCampaignImage(campaign);
+  const donaturTercatat = donatur.filter((d) => d.blockchain_tx_hash);
 
   return (
     <div className={styles.page}>
       {/* Gambar header */}
       <div className={styles.imageWrap}>
-        {campaign.image_url ? (
-          <img src={campaign.image_url} alt={campaign.title} className={styles.image} />
-        ) : (
-          <div className={styles.imagePlaceholder}>📷</div>
-        )}
+        <img
+          src={campaignImage}
+          alt={campaign.title}
+          className={styles.image}
+          onError={useCampaignImageFallback}
+        />
       </div>
 
       <div className={styles.layout}>
@@ -125,9 +129,24 @@ export default function CampaignDetail() {
                 {donatur.map((d) => (
                   <li key={d.id} className={styles.donaturItem}>
                     <span className={styles.donaturAvatar}>👤</span>
-                    <div>
+                    <div className={styles.donaturInfo}>
                       <p className={styles.donaturNama}>{d.donor_name}</p>
                       {d.message && <p className={styles.donaturPesan}>"{d.message}"</p>}
+                      {d.created_at && (
+                        <p className={styles.donaturTanggal}>
+                          Donasi {formatTanggal(d.created_at)}
+                        </p>
+                      )}
+                      {d.blockchain_tx_hash && (
+                        <a
+                          href={`https://sepolia.etherscan.io/tx/${d.blockchain_tx_hash}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={styles.donaturTxLink}
+                        >
+                          Lihat bukti transaksi ↗
+                        </a>
+                      )}
                     </div>
                     <span className={styles.donaturNominal}>{formatRupiah(d.amount)}</span>
                   </li>
@@ -135,12 +154,63 @@ export default function CampaignDetail() {
               </ul>
             </div>
           )}
+
+          {/* Section Verifikasi Blockchain */}
+          <div className={styles.blockchainVerifySection}>
+            <div className={styles.blockchainVerifyHeader}>
+              <span className={styles.blockchainVerifyIcon}>⛓️</span>
+              <div>
+                <h3 className={styles.blockchainVerifyTitle}>Transparansi Blockchain</h3>
+                <p className={styles.blockchainVerifySubtitle}>
+                  Donasi yang sudah dikonfirmasi dicatat sebagai bukti permanen di Ethereum Sepolia.
+                  Blockchain menyimpan catatan transaksi, sedangkan pembayaran diproses oleh Midtrans.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.blockchainVerifySteps}>
+              <div className={styles.verifyStep}>
+                <span className={styles.verifyStepNum}>1</span>
+                <div>
+                  <p className={styles.verifyStepTitle}>Catatan DonasiChain</p>
+                  <p className={styles.verifyStepDesc}>Alamat kontrak tempat catatan kampanye dan donasi disimpan</p>
+                  <a
+                    href="https://sepolia.etherscan.io/address/0x43817db78BB1Ce89ba25837A4af9279F1B4a4517"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={styles.verifyLink}
+                  >
+                    0x43817...4517 ↗
+                  </a>
+                </div>
+              </div>
+
+              <div className={styles.verifyStep}>
+                <span className={styles.verifyStepNum}>2</span>
+                <div>
+                  <p className={styles.verifyStepTitle}>Bukti yang dapat diperiksa</p>
+                  <p className={styles.verifyStepDesc}>
+                    {donaturTercatat.length > 0
+                      ? `${donaturTercatat.length} dari ${donatur.length} donasi terbaru memiliki bukti transaksi di blockchain`
+                      : 'Bukti transaksi akan muncul di daftar donatur setelah pencatatan dikonfirmasi'}
+                  </p>
+                </div>
+              </div>
+
+              <div className={styles.verifyStep}>
+                <span className={styles.verifyStepNum}>3</span>
+                <div>
+                  <p className={styles.verifyStepTitle}>Cara membaca bukti</p>
+                  <p className={styles.verifyStepDesc}>Cukup cocokkan status Success dan alamat kontrak DonasiChain di Etherscan. Hash hanya ID unik untuk membuka transaksi.</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Sidebar */}
         <aside className={styles.sidebar}>
           <div className={styles.card}>
-            {/* Progress */}
             <p className={styles.terkumpul}>{formatRupiah(campaign.collected_amount)}</p>
             <p className={styles.dariTarget}>
               terkumpul dari target <strong>{formatRupiah(campaign.target_amount)}</strong>
@@ -162,11 +232,10 @@ export default function CampaignDetail() {
               </div>
             </div>
 
-            {/* Tombol donasi */}
             {bisaDonasi ? (
               user ? (
                 <Link to={`/donasi/${campaign.id}`} className={styles.btnDonasi}>
-                  💚 Donasi Sekarang
+                  Donasi Sekarang
                 </Link>
               ) : (
                 <Link to="/masuk" className={styles.btnDonasi}>
@@ -179,21 +248,17 @@ export default function CampaignDetail() {
               </button>
             )}
 
-            {/* Info blockchain */}
-            {campaign.contract_address && (
-              <div className={styles.blockchainInfo}>
-                <p className={styles.blockchainLabel}>📦 Smart Contract</p>
-                <a
-                  href={`https://sepolia.etherscan.io/address/${campaign.contract_address}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={styles.blockchainLink}
-                >
-                  {campaign.contract_address.slice(0, 10)}...
-                  {campaign.contract_address.slice(-8)}
-                </a>
-              </div>
-            )}
+            <div className={styles.blockchainInfo}>
+              <p className={styles.blockchainLabel}>⛓️ Dicatat di Blockchain</p>
+              <a
+                href="https://sepolia.etherscan.io/address/0x43817db78BB1Ce89ba25837A4af9279F1B4a4517"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={styles.blockchainLink}
+              >
+                Lihat di Sepolia Etherscan ↗
+              </a>
+            </div>
           </div>
 
           <Link to="/kampanye" className={styles.linkKembali}>← Kembali ke Daftar</Link>

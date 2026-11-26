@@ -109,23 +109,51 @@ export default function TransactionStatus() {
             </div>
           )}
           <div className={styles.infoItem}>
-            <span className={styles.infoLabel}>Order ID</span>
+            <span className={styles.infoLabel}>Referensi Donasi</span>
             <code className={styles.infoCode}>{data.order_id}</code>
           </div>
           <div className={styles.infoItem}>
-            <span className={styles.infoLabel}>Diperbarui</span>
-            <span className={styles.infoValue}>{formatWaktu(data.updated_at)}</span>
+            <span className={styles.infoLabel}>Waktu Donasi</span>
+            <span className={styles.infoValue}>{formatWaktu(data.created_at)}</span>
           </div>
         </div>
 
         {/* Blockchain info — hanya tampil jika ada */}
         {data.blockchain_status && (
           <div className={styles.blockchainSection}>
-            <p className={styles.blockchainTitle}>📦 Pencatatan Blockchain</p>
+            <div>
+              <p className={styles.blockchainTitle}>Bukti di Blockchain</p>
+              <p className={styles.blockchainIntro}>
+                Blockchain menyimpan bukti pencatatan donasi. Pembayaran tetap dikonfirmasi
+                melalui status pembayaran di atas.
+              </p>
+            </div>
             <BlockchainBadge
               txHash={data.blockchain_tx_hash}
               blockchainStatus={data.blockchain_status}
             />
+            {data.blockchain_tx_hash && data.blockchain_status === 'recorded' && (
+              <p className={styles.blockchainVerify}>
+                Hash adalah ID unik untuk membuka transaksi—tidak perlu dibaca satu per satu.
+                Di Etherscan, periksa status <strong>Success</strong> dan bahwa transaksi menuju
+                kontrak DonasiChain.
+              </p>
+            )}
+            {data.blockchain_tx_hash && data.blockchain_status === 'recorded' && (
+              <a
+                className={styles.contractLink}
+                href="https://sepolia.etherscan.io/address/0x43817db78BB1Ce89ba25837A4af9279F1B4a4517"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Lihat kontrak resmi DonasiChain ↗
+              </a>
+            )}
+            {data.blockchain_status === 'pending' && (
+              <p className={styles.blockchainPendingNote}>
+                Pencatatan blockchain sedang diproses. Biasanya selesai dalam 1-2 menit setelah pembayaran dikonfirmasi.
+              </p>
+            )}
           </div>
         )}
 

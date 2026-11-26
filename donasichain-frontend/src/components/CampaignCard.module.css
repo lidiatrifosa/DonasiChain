@@ -31,10 +31,29 @@
   width: 100%;
   height: 100%;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: 3rem;
-  color: #9ca3af;
+  gap: 0.4rem;
+  padding: 1rem;
+}
+
+.placeholderInitial {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: rgba(255,255,255,0.9);
+  line-height: 1;
+}
+
+.placeholderTitle {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.8);
+  text-align: center;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .statusBadge {

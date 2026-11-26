@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { login } from '../api/auth';
 import { useAuth } from '../context/AuthContext';
 import styles from './AuthForm.module.css';
+import BrandMark from '../components/BrandMark';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -44,7 +45,7 @@ export default function Login() {
     <div className={styles.page}>
       <div className={styles.card}>
         <div className={styles.header}>
-          <span className={styles.logo}>💚</span>
+          <span className={styles.logo}><BrandMark /></span>
           <h1 className={styles.title}>Masuk ke DonasiChain</h1>
           <p className={styles.subtitle}>Selamat datang kembali</p>
         </div>

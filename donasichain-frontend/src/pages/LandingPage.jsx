@@ -5,9 +5,9 @@ import CampaignCard from '../components/CampaignCard';
 import styles from './LandingPage.module.css';
 
 const FITUR = [
-  { icon: '🔒', judul: 'Transparan & Aman', deskripsi: 'Setiap donasi dicatat di blockchain Ethereum Sepolia sehingga dapat ditelusuri siapa saja.' },
-  { icon: '💳', judul: 'Pembayaran Mudah', deskripsi: 'Didukung Midtrans Sandbox dengan berbagai metode pembayaran yang familiar.' },
-  { icon: '📊', judul: 'Progres Real-time', deskripsi: 'Pantau perkembangan kampanye secara langsung dengan data yang selalu diperbarui.' },
+  { nomor: '01', judul: 'Transparan & Aman', deskripsi: 'Setiap donasi dicatat di blockchain Ethereum Sepolia sehingga dapat ditelusuri siapa saja.' },
+  { nomor: '02', judul: 'Pembayaran Mudah', deskripsi: 'Didukung Midtrans Sandbox dengan berbagai metode pembayaran yang familiar.' },
+  { nomor: '03', judul: 'Progres Real-time', deskripsi: 'Pantau perkembangan kampanye secara langsung dengan data yang selalu diperbarui.' },
 ];
 
 export default function LandingPage() {
@@ -27,7 +27,7 @@ export default function LandingPage() {
       {/* Hero */}
       <section className={styles.hero}>
         <div className={styles.heroContent}>
-          <span className={styles.heroBadge}>💚 Berbasis Blockchain Ethereum</span>
+          <span className={styles.heroBadge}>Berbasis Blockchain Ethereum</span>
           <h1 className={styles.heroTitle}>
             Donasi Lebih Transparan,<br />Dampak Lebih Nyata
           </h1>
@@ -42,9 +42,11 @@ export default function LandingPage() {
         </div>
         <div className={styles.heroVisual}>
           <div className={styles.heroCard}>
-            <div className={styles.heroCardIcon}>🌱</div>
-            <p className={styles.heroCardText}>Setiap donasi tercatat permanen di blockchain</p>
-            <code className={styles.heroCardHash}>0xabc...def ✓</code>
+            <div className={styles.heroCardPhoto} />
+            <div className={styles.heroCardCopy}>
+              <p className={styles.heroCardText}>Setiap donasi tercatat permanen di blockchain</p>
+              <code className={styles.heroCardHash}>0x43817...4517</code>
+            </div>
           </div>
         </div>
       </section>
@@ -98,7 +100,7 @@ export default function LandingPage() {
         <div className={styles.fiturGrid}>
           {FITUR.map((f) => (
             <div key={f.judul} className={styles.fiturCard}>
-              <span className={styles.fiturIcon}>{f.icon}</span>
+              <span className={styles.fiturIcon}>{f.nomor}</span>
               <h3 className={styles.fiturJudul}>{f.judul}</h3>
               <p className={styles.fiturDeskripsi}>{f.deskripsi}</p>
             </div>

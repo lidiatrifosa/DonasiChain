@@ -243,7 +243,7 @@ async function getDonationStatusByOrderId(req, res) {
   try {
     const [rows] = await db.query(
       `SELECT d.order_id, d.amount, d.payment_status, d.payment_method,
-              d.snap_token, d.blockchain_tx_hash, d.blockchain_status, d.updated_at,
+              d.snap_token, d.blockchain_tx_hash, d.blockchain_status, d.created_at, d.updated_at,
               c.title AS campaign_title, c.id AS campaign_id
        FROM donations d
        JOIN campaigns c ON d.campaign_id = c.id

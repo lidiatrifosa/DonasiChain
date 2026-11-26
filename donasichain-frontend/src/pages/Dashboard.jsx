@@ -106,7 +106,7 @@ export default function Dashboard() {
           <h1 className={styles.profileName}>{user?.name}</h1>
           <p className={styles.profileEmail}>{user?.email}</p>
           <span className={styles.roleBadge}>
-            {user?.role === 'donor' ? '💚 Donatur' : user?.role === 'fundraiser' ? '🌱 Penggalang Dana' : '🔧 Admin'}
+            {user?.role === 'donor' ? 'Donatur' : user?.role === 'fundraiser' ? 'Penggalang Dana' : 'Admin'}
           </span>
         </div>
         {isFundraiser && (
@@ -247,7 +247,7 @@ export default function Dashboard() {
           {campError && <p className={styles.errorMsg}>{campError}</p>}
           {!campLoading && !campError && campaigns.length === 0 && (
             <div className={styles.emptyState}>
-              <span className={styles.emptyIcon}>🌱</span>
+              <span className={styles.emptyIcon}>—</span>
               <p>Belum ada kampanye yang dibuat.</p>
               <Link to="/kampanye/buat" className={styles.btnExplore}>
                 Buat Kampanye Pertama

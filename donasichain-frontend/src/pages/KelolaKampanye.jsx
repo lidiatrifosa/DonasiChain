@@ -171,7 +171,7 @@ export default function KelolaKampanye() {
 
       {!loading && !error && campaigns.length === 0 && (
         <div className={styles.emptyState}>
-          <span className={styles.emptyIcon}>🌱</span>
+          <span className={styles.emptyIcon}>—</span>
           <p>Belum ada kampanye. Mulai buat kampanye pertamamu!</p>
           <Link to="/kampanye/buat" className={styles.btnBuatEmpty}>Buat Kampanye</Link>
         </div>

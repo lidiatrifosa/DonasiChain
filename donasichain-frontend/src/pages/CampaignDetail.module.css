@@ -21,10 +21,27 @@
   width: 100%;
   height: 100%;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 0.75rem;
+}
+
+.placeholderInitial {
   font-size: 5rem;
-  color: #d1d5db;
+  font-weight: 800;
+  color: rgba(255,255,255,0.9);
+  line-height: 1;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.placeholderTitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.85);
+  text-align: center;
+  max-width: 60%;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.2);
 }
 
 .layout {
@@ -109,6 +126,116 @@
   background: #f9fafb;
   border-radius: 8px;
 }
+
+.donaturInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.donaturTxLink {
+  font-size: 0.78rem;
+  color: #2563eb;
+  text-decoration: none;
+  display: inline-block;
+  margin-top: 0.25rem;
+}
+
+.donaturTxLink:hover { text-decoration: underline; }
+
+.donaturTanggal {
+  color: #6b7280;
+  font-size: 0.75rem;
+  margin: 0.25rem 0 0;
+}
+
+/* Blockchain Verify Section */
+.blockchainVerifySection {
+  margin-top: 2.5rem;
+  border: 1.5px solid #bbf7d0;
+  border-radius: 12px;
+  background: #f0fdf4;
+  padding: 1.5rem;
+}
+
+.blockchainVerifyHeader {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  margin-bottom: 1.25rem;
+}
+
+.blockchainVerifyIcon {
+  font-size: 1.75rem;
+  flex-shrink: 0;
+}
+
+.blockchainVerifyTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #15803d;
+  margin: 0 0 0.25rem;
+}
+
+.blockchainVerifySubtitle {
+  font-size: 0.875rem;
+  color: #374151;
+  margin: 0;
+  line-height: 1.6;
+}
+
+.blockchainVerifySteps {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.verifyStep {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  background: #fff;
+  border-radius: 8px;
+  padding: 0.875rem;
+}
+
+.verifyStepNum {
+  width: 24px;
+  height: 24px;
+  background: #16a34a;
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.verifyStepTitle {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #111827;
+  margin: 0 0 0.2rem;
+}
+
+.verifyStepDesc {
+  font-size: 0.8rem;
+  color: #6b7280;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.verifyLink {
+  font-size: 0.8rem;
+  color: #2563eb;
+  text-decoration: none;
+  font-family: monospace;
+  display: inline-block;
+  margin-top: 0.25rem;
+}
+
+.verifyLink:hover { text-decoration: underline; }
 
 .donaturAvatar {
   font-size: 1.5rem;

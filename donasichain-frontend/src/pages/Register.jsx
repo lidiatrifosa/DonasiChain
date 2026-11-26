@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { register } from '../api/auth';
 import styles from './AuthForm.module.css';
+import BrandMark from '../components/BrandMark';
 
 const ROLE_OPTIONS = [
   { value: 'donor', label: 'Donatur — saya ingin berdonasi' },
@@ -75,7 +76,7 @@ export default function Register() {
     <div className={styles.page}>
       <div className={styles.card}>
         <div className={styles.header}>
-          <span className={styles.logo}>💚</span>
+          <span className={styles.logo}><BrandMark /></span>
           <h1 className={styles.title}>Daftar ke DonasiChain</h1>
           <p className={styles.subtitle}>Bergabung dan mulai berdonasi</p>
         </div>

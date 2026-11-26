@@ -1,0 +1,56 @@
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  color: #111827;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.mark {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px 10px 10px 3px;
+  background: #166534;
+  color: #fff;
+  box-shadow: 0 6px 18px rgba(22, 101, 52, 0.18);
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  transform: rotate(-2deg);
+}
+
+.mark span {
+  transform: rotate(2deg);
+}
+
+.wordmark {
+  font-size: 1.28rem;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+}
+
+.wordmark span {
+  color: #166534;
+}
+
+.compact .mark {
+  width: 34px;
+  height: 34px;
+}
+
+.inverse {
+  color: #ffffff;
+}
+
+.inverse .mark {
+  background: #ffffff;
+  color: #166534;
+  box-shadow: none;
+}
+
+.inverse .wordmark span {
+  color: #86efac;
+}

@@ -62,7 +62,7 @@ CREATE TABLE IF NOT EXISTS donations (
   FOREIGN KEY (campaign_id) REFERENCES campaigns(id) ON DELETE RESTRICT,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE RESTRICT
 );
-
+x
 -- ============================================================
 -- Tabel campaign_status_logs
 -- ============================================================
